@@ -24,7 +24,7 @@ defmodule EvmTest do
       :fibonacci10
 
       # These tests take too long to execute but they pass.
-      # :"loop-divadd-10M"
+      # :"loop-divadd-10M",
       # :"loop-exp-16b-100k",
       # :"loop-exp-2b-100k",
       # :"loop-exp-4b-100k",
@@ -34,7 +34,7 @@ defmodule EvmTest do
       # :"loop-divadd-unr100-10M",
       # :"loop-exp-1b-1M",
       # :"loop-exp-32b-100k",
-      # :"loop-exp-8b-100k"
+      # :"loop-exp-8b-100k",
       # :"loop-mul"
     ],
     i_oand_flow_operations: :all,
