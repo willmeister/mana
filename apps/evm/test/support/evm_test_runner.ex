@@ -23,7 +23,7 @@ defmodule EvmTestRunner do
     }
   end
 
-  def block_header_info(json) do
+  defp block_header_info(json) do
     genisis_block_header = %Block.Header{
       number: 0,
       mix_hash: 0
@@ -68,7 +68,7 @@ defmodule EvmTestRunner do
     )
   end
 
-  def account_repo(json) do
+  defp account_repo(json) do
     account_map = %{
       hex_to_bin(json["exec"]["caller"]) => %{
         balance: 0,
