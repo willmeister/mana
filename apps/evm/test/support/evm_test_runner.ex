@@ -26,7 +26,7 @@ defmodule EvmTestRunner do
   defp block_header_info(json) do
     genisis_block_header = %Block.Header{
       number: 0,
-      mix_hash: 0
+      mix_hash: 0x0000000000000000000000000000000000000000000000000000000000000000
     }
 
     first_block_header = %Block.Header{
@@ -48,7 +48,7 @@ defmodule EvmTestRunner do
       number: hex_to_int(json["env"]["currentNumber"]),
       timestamp: hex_to_int(json["env"]["currentTimestamp"]),
       beneficiary: hex_to_bin(json["env"]["currentCoinbase"]),
-      mix_hash: 0,
+      mix_hash: 0x0000000000000000000000000000000000000000000000000000000000000000,
       parent_hash: hex_to_int(json["env"]["currentNumber"]) - 1,
       gas_limit: hex_to_int(json["env"]["currentGasLimit"]),
       difficulty: hex_to_int(json["env"]["currentDifficulty"])
