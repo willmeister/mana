@@ -24,24 +24,62 @@ defmodule EvmTestRunner do
   end
 
   defp block_header_info(json) do
-    genisis_block_header = %Block.Header{
+    if json["env"]["currentNumber"] == "0x00" do
+      single_block_header_info(json)
+    else
+      many_blocks_header_info(json)
+    end
+  end
+
+  defp single_block_header_info(json) do
+    genesis_block_header = %Block.Header{
+      number: hex_to_int(json["env"]["currentNumber"]),
+      timestamp: hex_to_int(json["env"]["currentTimestamp"]),
+      beneficiary: hex_to_bin(json["env"]["currentCoinbase"]),
+      mix_hash: 0x0000000000000000000000000000000000000000000000000000000000000000,
+      parent_hash: 0,
+      gas_limit: hex_to_int(json["env"]["currentGasLimit"]),
+      difficulty: hex_to_int(json["env"]["currentDifficulty"])
+    }
+
+    build_block_header_info([genesis_block_header])
+  end
+
+  defp many_blocks_header_info(json) do
+    genesis_block_header = %Block.Header{
       number: 0,
-      mix_hash: 0x0000000000000000000000000000000000000000000000000000000000000000
+      timestamp: hex_to_int(json["env"]["currentTimestamp"]) - 1,
+      beneficiary: hex_to_bin(json["env"]["currentCoinbase"]),
+      mix_hash: 0x0000000000000000000000000000000000000000000000000000000000000000,
+      parent_hash: 0,
+      difficulty: hex_to_int(json["env"]["currentDifficulty"]) - 4
     }
 
     first_block_header = %Block.Header{
       number: 1,
-      mix_hash: 0xC89EFDAA54C0F20C7ADF612882DF0950F5A951637E0307CDCB4C672F298B8BC6
+      timestamp: hex_to_int(json["env"]["currentTimestamp"]) - 1,
+      beneficiary: hex_to_bin(json["env"]["currentCoinbase"]),
+      mix_hash: 0xC89EFDAA54C0F20C7ADF612882DF0950F5A951637E0307CDCB4C672F298B8BC6,
+      parent_hash: 0,
+      difficulty: hex_to_int(json["env"]["currentDifficulty"]) - 3
     }
 
     second_block_header = %Block.Header{
       number: 2,
-      mix_hash: 0xAD7C5BEF027816A800DA1736444FB58A807EF4C9603B7848673F7E3A68EB14A5
+      timestamp: hex_to_int(json["env"]["currentTimestamp"]) - 1,
+      beneficiary: hex_to_bin(json["env"]["currentCoinbase"]),
+      mix_hash: 0xAD7C5BEF027816A800DA1736444FB58A807EF4C9603B7848673F7E3A68EB14A5,
+      parent_hash: 0xC89EFDAA54C0F20C7ADF612882DF0950F5A951637E0307CDCB4C672F298B8BC6,
+      difficulty: hex_to_int(json["env"]["currentDifficulty"]) - 2
     }
 
     parent_block_header = %Block.Header{
       number: hex_to_int(json["env"]["currentNumber"]) - 1,
-      mix_hash: 0x6CA54DA2C4784EA43FD88B3402DE07AE4BCED597CBB19F323B7595857A6720AE
+      timestamp: hex_to_int(json["env"]["currentTimestamp"]) - 1,
+      beneficiary: hex_to_bin(json["env"]["currentCoinbase"]),
+      mix_hash: 0x6CA54DA2C4784EA43FD88B3402DE07AE4BCED597CBB19F323B7595857A6720AE,
+      parent_hash: 0xAD7C5BEF027816A800DA1736444FB58A807EF4C9603B7848673F7E3A68EB14A5,
+      difficulty: hex_to_int(json["env"]["currentDifficulty"]) - 1
     }
 
     last_block_header = %Block.Header{
@@ -49,23 +87,27 @@ defmodule EvmTestRunner do
       timestamp: hex_to_int(json["env"]["currentTimestamp"]),
       beneficiary: hex_to_bin(json["env"]["currentCoinbase"]),
       mix_hash: 0x0000000000000000000000000000000000000000000000000000000000000000,
-      parent_hash: hex_to_int(json["env"]["currentNumber"]) - 1,
+      parent_hash: 0x6CA54DA2C4784EA43FD88B3402DE07AE4BCED597CBB19F323B7595857A6720AE,
       gas_limit: hex_to_int(json["env"]["currentGasLimit"]),
       difficulty: hex_to_int(json["env"]["currentDifficulty"])
     }
 
-    block_map = %{
-      genisis_block_header.mix_hash => genisis_block_header,
-      first_block_header.mix_hash => first_block_header,
-      second_block_header.mix_hash => second_block_header,
-      parent_block_header.mix_hash => parent_block_header,
-      last_block_header.mix_hash => last_block_header
-    }
-
-    MockBlockHeaderInfo.new(
+    build_block_header_info([
       last_block_header,
-      block_map
-    )
+      parent_block_header,
+      second_block_header,
+      first_block_header,
+      genesis_block_header
+    ])
+  end
+
+  defp build_block_header_info(headers = [most_recent_header | _]) do
+    block_map =
+      Enum.into(headers, %{}, fn header ->
+        {Block.Header.hash(header), header}
+      end)
+
+    MockBlockHeaderInfo.new(most_recent_header, block_map)
   end
 
   defp account_repo(json) do
