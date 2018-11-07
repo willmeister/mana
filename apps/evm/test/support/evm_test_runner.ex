@@ -1,16 +1,17 @@
-defmodule EvmTestRunner do
+defmodule EVM.TestRunner do
   import ExthCrypto.Math, only: [hex_to_bin: 1, hex_to_int: 1]
 
   alias EVM.Mock.{MockAccountRepo, MockBlockHeaderInfo}
+  alias EVM.{ExecEnv, SubState, VM}
 
   def run(json) do
     exec_env = get_exec_env(json)
     gas = hex_to_int(json["exec"]["gas"])
-    EVM.VM.run(gas, exec_env)
+    VM.run(gas, exec_env)
   end
 
   defp get_exec_env(json) do
-    %EVM.ExecEnv{
+    %ExecEnv{
       account_repo: account_repo(json),
       address: hex_to_bin(json["exec"]["address"]),
       block_header_info: block_header_info(json),
@@ -140,7 +141,7 @@ defmodule EvmTestRunner do
 
     contract_result = %{
       gas: 0,
-      sub_state: %EVM.SubState{},
+      sub_state: %SubState{},
       output: <<>>
     }
 

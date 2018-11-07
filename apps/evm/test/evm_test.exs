@@ -2,6 +2,7 @@ defmodule EvmTest do
   import ExthCrypto.Math, only: [hex_to_bin: 1, hex_to_int: 1]
 
   alias ExthCrypto.Hash.Keccak
+  alias EVM.TestRunner
 
   use ExUnit.Case, async: true
 
@@ -45,7 +46,7 @@ defmodule EvmTest do
   test "Ethereum Common Tests" do
     for {test_group_name, _test_group} <- @passing_tests_by_group do
       for {test_name, test} <- passing_tests(test_group_name) do
-        {gas, sub_state, exec_env, _} = EvmTestRunner.run(test)
+        {gas, sub_state, exec_env, _} = TestRunner.run(test)
 
         context = %{
           test_name: test_name,
