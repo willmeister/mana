@@ -1,8 +1,8 @@
 defmodule EvmTest do
   import ExthCrypto.Math, only: [hex_to_bin: 1, hex_to_int: 1]
 
-  alias ExthCrypto.Hash.Keccak
   alias EVM.TestRunner
+  alias ExthCrypto.Hash.Keccak
 
   use ExUnit.Case, async: true
 
